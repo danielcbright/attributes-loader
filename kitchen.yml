@@ -1,0 +1,23 @@
+---
+provisioner:
+  name: chef_zero
+  deprecations_as_errors: true
+  chef_license: accept-no-persist
+  product_name: chef
+  product_version: 16
+
+platforms:
+  - name: centos-7
+    driver:
+      name: docker
+    driver_config:
+      run_command: /usr/sbin/init
+      privileged: true
+      provision_command:
+        - sed -i 's/UsePAM yes/UsePAM no/g' /etc/ssh/sshd_config
+        - systemctl enable sshd.service
+
+suites:
+  - name: default
+    run_list:
+      - recipe[attributes-loader::default]
