@@ -3,7 +3,7 @@ maintainer 'Daniel Bright'
 maintainer_email 'danielcbright@gmail.com'
 license 'Apache-2.0'
 description 'Installs/Configures attributes-loader'
-version '0.1.3'
+version '0.1.4'
 chef_version '>= 15.0'
 
 # The `issues_url` points to the location where issues for this cookbook are
