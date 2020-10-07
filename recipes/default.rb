@@ -4,9 +4,9 @@
 #
 # Copyright:: 2020, The Authors, All Rights Reserved.
 
-node.default['attributes-loader']['dbags'].each do |dbag|
+node.default['attributes-loader']['dbags'].each do |dbag, v|
   begin
-    data_bag_item(dbag, 'attributes')['all'].each do |key, value|
+    data_bag_item(dbag, 'attributes', v['secret_file'])['all'].each do |key, value|
       if node.key?(key)
         puts "==== Attribute default is set, merging: #{dbag}:all:#{key}"
         node.default[key] = Chef::Mixin::DeepMerge.hash_only_merge(node.default[key], value)
@@ -18,7 +18,7 @@ node.default['attributes-loader']['dbags'].each do |dbag|
     puts "==== Data Bag '#{dbag}:all' not found, using default attributes"
   end
   begin
-    data_bag_item(dbag, 'attributes')[node.policy_group].each do |key, value|
+    data_bag_item(dbag, 'attributes', v['secret_file'])[node.policy_group].each do |key, value|
       if node.key?(key)
         puts "==== Attribute default is set, merging: #{dbag}:#{node.policy_group}:#{key}"
         node.default[key] = Chef::Mixin::DeepMerge.hash_only_merge(node.default[key], value)
@@ -28,6 +28,18 @@ node.default['attributes-loader']['dbags'].each do |dbag|
     end
   rescue
     puts "==== Data Bag '#{dbag}:#{node.policy_group}' not found, using default attributes"
+  end
+  begin
+    data_bag_item(dbag, 'attributes', v['secret_file'])[node['hostname']].each do |key, value|
+      if node.key?(key)
+        puts "==== Attribute default is set, merging: #{dbag}:#{node['hostname']}:#{key}"
+        node.default[key] = Chef::Mixin::DeepMerge.hash_only_merge(node.default[key], value)
+      else
+        puts "==== Attribute default is not set, not merging for: #{dbag}:#{node['hostname']}:#{key}"
+      end
+    end
+  rescue
+    puts "==== Data Bag '#{dbag}:#{node['hostname']}' not found, using default attributes"
   end
 end
 
